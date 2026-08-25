@@ -14,21 +14,26 @@ export class StateEngine {
     return { vector: valid, mean, strongest, weakest };
   }
 
-  snapshot(snapshot: StateSnapshot): StateSnapshot {
-    return StateSnapshotSchema.parse(snapshot);
-  }
+  snapshot(snapshot: StateSnapshot): StateSnapshot { return StateSnapshotSchema.parse(snapshot); }
 
   delta(before: StateVector, after: StateVector): StateDelta {
     const a = StateVectorSchema.parse(before);
     const b = StateVectorSchema.parse(after);
-    return Object.fromEntries(DIMENSIONS.map((dimension) => [dimension, Number((b[dimension] - a[dimension]).toFixed(4))]));
+    return Object.fromEntries(DIMENSIONS.map((dimension) => [dimension, Number((b[dimension] - a[dimension]).toFixed(4))])) as StateDelta;
   }
 
   transition(before: StateVector, after: StateVector): TransitionAssessment {
     const delta = this.delta(before, after);
-    const values = Object.values(delta);
-    const magnitude = values.reduce((sum, value) => sum + Math.abs(value), 0) / values.length;
-    const net = values.reduce((sum, value) => sum + value, 0) / values.length;
-    return { delta, magnitude, direction: net > 0.02 ? "improved" : net < -0.02 ? "declined" : "stable" };
+    const values = DIMENSIONS.map((dimension) => delta[dimension]);
+    const euclideanDistance = Math.sqrt(values.reduce((sum, value) => sum + value ** 2, 0));
+    const meanAbsoluteDelta = values.reduce((sum, value) => sum + Math.abs(value), 0) / values.length;
+    const capacityChange = values.reduce((sum, value) => sum + value, 0) / values.length;
+    return {
+      delta,
+      euclideanDistance: Number(euclideanDistance.toFixed(4)),
+      meanAbsoluteDelta: Number(meanAbsoluteDelta.toFixed(4)),
+      capacityChange: Number(capacityChange.toFixed(4)),
+      direction: capacityChange > 0.02 ? "improved" : capacityChange < -0.02 ? "declined" : "stable",
+    };
   }
 }
