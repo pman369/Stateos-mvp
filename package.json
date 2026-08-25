@@ -1,0 +1,23 @@
+{
+  "name": "stateos-mvp",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "npm@10.9.3",
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "build": "npm run build --workspace @stateos/web",
+    "dev": "npm run dev --workspace @stateos/web",
+    "lint": "npm run lint --workspace @stateos/web",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "engines": {"node": ">=20.0.0"},
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
